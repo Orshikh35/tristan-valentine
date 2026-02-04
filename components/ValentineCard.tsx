@@ -65,6 +65,20 @@ export default function ValentineCard() {
     }).catch(() => {});
   }
   
+  useEffect(() => {
+    fetch("/api/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ts: new Date().toISOString(),
+        page: window.location.href,
+        referrer: document.referrer || "",
+        userAgent: navigator.userAgent,
+      }),
+    }).catch(() => {});
+  }, []);
+
+  
   // prepare background music (try autoplay, but still gate interactions until user chooses)
   useEffect(() => {
     const audio = new Audio("/sounds/duu.mp3");
