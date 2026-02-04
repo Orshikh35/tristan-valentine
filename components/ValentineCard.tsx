@@ -52,10 +52,19 @@ export default function ValentineCard() {
   );
 
   function notifyAction(action: Action) {
-    // эндээс API руу явуулж болно
-    console.log("VALENTINE ACTION:", action, new Date().toISOString());
+    // ✅ YES/NO дарсан мөчид сервер рүү явуулна
+    fetch("/api/valentine", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action,
+        ts: new Date().toISOString(),
+        page: typeof window !== "undefined" ? window.location.href : "",
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+      }),
+    }).catch(() => {});
   }
-
+  
   // prepare background music (try autoplay, but still gate interactions until user chooses)
   useEffect(() => {
     const audio = new Audio("/sounds/duu.mp3");

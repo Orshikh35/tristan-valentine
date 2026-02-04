@@ -8,11 +8,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, message: "Missing action" }, { status: 400 });
   }
 
-  // SMTP тохиргоо (.env дээр хадгална)
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return NextResponse.json({ ok: false, message: "SMTP env missing" }, { status: 500 });
+  }
+
+  const port = Number(process.env.SMTP_PORT || 587);
+  const secure = port === 465;
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: false,
+    port,
+    secure,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -27,8 +33,8 @@ export async function POST(req: Request) {
     `UserAgent: ${body.userAgent}\n`;
 
   await transporter.sendMail({
-    from: process.env.SMTP_FROM,       // ж: "Valentine Bot <bot@yourdomain.com>"
-    to: process.env.NOTIFY_EMAIL,      // чиний email
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to: process.env.NOTIFY_EMAIL!,
     subject,
     text,
   });
